@@ -1,19 +1,20 @@
 vim9script
 
 export var options: dict<any> = {
-    setupKeybindings: true,
-    previewWindow: true,
-    previewWindowSize: 3,
-    fuzzySearch: false,
-    maxHeight: 0,
+    maxHeight: 10,
+    highlight: 'SearchComplete',
+    borderhighlight: 'SearchCompleteBorderHighlight',
+    scrollbarhighlight: 'SearchCompleteScrollbarHighlight',
+    thumbhighlight: 'SearchCompleteThumbHighlight',
+    #borderchars: ['-', '|', '-', '|', '┌', '┐', '┘', '└'],
 }
 
 # Encapsulate the state and operations of popup menu completion.
 def NewPopup(searchForward: bool): dict<any>
     var popup = {
 	winid: -1,	    # id of popup window
-	keywords: [],	    # cached keywords shown in popup menu
-	candidates: [],	    # cached candidates for completion (could be phrases)
+	keywords: [],	    # keywords shown in popup menu
+	candidates: [],	    # candidates for completion (could be phrases)
 	index: 0,			# index to keywords and candidates array
 	prefix: '',			# cached cmdline contents
 	searchForward: searchForward,	# true for '/' and false for '?'
@@ -22,8 +23,6 @@ def NewPopup(searchForward: bool): dict<any>
 	complete: function(PopupComplete, [popup]),
 	selectItem: function(SelectItem, [popup]),
 	menu: function(Menu, [popup]),
-	multiWords: function(MultiWords, [popup]),
-	# words: function(Words, [popup]),
     })
     return popup
 enddef
@@ -32,6 +31,7 @@ var popupCompletor = {}
 
 def Init()
     popupCompletor = getcmdtype() == '/' ? NewPopup(true) : NewPopup(false)
+    # setwinvar(popupCompletor.winid, '&wincolor', 'searchcomplete')
 enddef
 
 def Teardown()
@@ -52,28 +52,26 @@ export def Setup()
 enddef
 
 def EnableCmdline()
-    # autocmd SearchComplete CmdlineChanged /,\? Complete()
-    # [{
-	# group: 'SearchComplete',
-	# event: 'CmdlineChanged',
-	# pattern: ['/', '\?'],
-	# cmd: 'Complete()',
-	# replace: true,
-    # }]->autocmd_add()
+    [{
+	group: 'SearchComplete',
+	event: 'CmdlineChanged',
+	pattern: ['/', '\?'],
+	cmd: 'Complete()',
+	replace: true,
+    }]->autocmd_add()
 enddef
 
 def DisableCmdline()
-    # autocmd! SearchComplete CmdlineChanged
-    # [{
-	# group: 'SearchComplete',
-	# event: 'CmdlineChanged',
-	# pattern: ['/', '\?'],
-    # }]->autocmd_delete()
+    [{
+	group: 'SearchComplete',
+	event: 'CmdlineChanged',
+	pattern: ['/', '\?'],
+    }]->autocmd_delete()
 enddef
 
 # # Return a list of keywords suitable for completion, sorted according to
 # # distance from cursor.
-# def Words(popup: dict<any>): list<any>
+# def WordMatch(popup: dict<any>): list<any>
 #     var p = popup
 #     var words = []
 #     var dist = {}
@@ -97,24 +95,24 @@ enddef
 #     if &ignorecase && &smartcase && p.prefix =~ '\u\+'
 # 	icase = false
 #     endif
-#     var candidates = words->filter((_, val) =>
+#     var candidates = words->copy()->filter((_, val) =>
 # 		\ (icase ? val->tolower()->stridx(p.prefix) : val->stridx(p.prefix)) == 0)
 #     return candidates->sort((x, y) => dist[x] < dist[y] ? -1 : 1)
 # enddef
 
-# Match entire prefix (commandline contents) even if it is multiword. Return a
-# list of matches. Useful when user continues to search after first keyword.
-def MultiWords(popup: dict<any>): list<any>
+# Match entire prefix (commandline) even if it is multiword. Return a
+# list of matches.
+def MatchingStrings(popup: dict<any>): list<any>
     var p = popup
     var matches = []
     var found = {}
     var flags = $'w{p.searchForward ? "" : "b"}' # use 'w' to match pattern under cursor
-    var pattern = $'{p.prefix}\k*' # XXX: test if \S is better
+    var pattern = $'\k*{p.prefix}\k*' # XXX: test if \S is better
+
     var [lnum, cnum] = pattern->searchpos(flags)
     var [startl, startc] = [lnum, cnum]
-
     while lnum != 0 && cnum != 0
-	var mstr = getline(lnum)->strpart(cnum - 1)->substitute($'^{p.prefix}\(\k*\).*$', $'{p.prefix}\1', '')
+	var mstr = getline(lnum)->strpart(cnum - 1)->substitute($'^\c\(\k*{p.prefix}\k*\).*$', $'\1', '')
 	if mstr != p.prefix && !found->has_key(mstr)
 	    found[mstr] = 1
 	    matches->add(mstr)
@@ -124,7 +122,7 @@ def MultiWords(popup: dict<any>): list<any>
 	    break
 	endif
     endwhile
-    return matches
+    return matches->copy()->filter((_, v) => v =~ $'^{p.prefix}') + matches->copy()->filter((_, v) => v !~ $'^{p.prefix}')
 enddef
 
 
@@ -138,15 +136,15 @@ def Menu(popup: dict<any>)
 	    return
 	endif
 	p.candidates = {}
-	# if p.prefix !~ '\s'
-	#     p.candidates = p.words()
-	#     if len(p.candidates) > 0
-	# 	p.keywords = p.candidates
-	#     endif
-	# endif
+	if p.prefix !~ '\s'
+	    # p.candidates = p.wordMatch()
+	    if len(p.candidates) > 0
+		p.keywords = p.candidates
+	    endif
+	endif
 	if len(p.candidates) == 0
-	    p.candidates = p.multiWords()
-	    p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\S\+$'))
+	    p.candidates = p->MatchingStrings()
+	    p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
 	endif
     endif
     if len(p.keywords) > 0
@@ -204,7 +202,7 @@ def Filter(winid: number, key: string): bool
 	    setcmdline('')
 	    feedkeys(p.prefix, 'n')
 	    :redraw!
-	    timer_start(0, (_) => EnableCmdline()) # que this after feeding keys
+	    timer_start(0, (_) => EnableCmdline()) # timer will que this after feedkeys
 	elseif key ==? "\<cr>" || key ==? "\<esc>"
 	    p.winid->popup_filter_menu('x')
 	    var ret = p.winid->popup_filter_menu(key)
@@ -230,7 +228,6 @@ def PopupComplete(popup: dict<any>)
 	    cursorline: false, # Do not automatically select the first item
 	    pos: 'botleft',
 	    line: &lines - &cmdheight,
-	    # highlight: 'SearchCompleteNormal' # Popup PopupSel
 	    drag: false,
 	    filtermode: 'c',
 	    filter: Filter,
@@ -241,6 +238,7 @@ def PopupComplete(popup: dict<any>)
 		endif
 	    },
 	})
+	# }->extend(options, 'force'))
 	p.winid->popup_hide()
 	DisableCmdline() # So that only filter fn of popup consumes keys
     endif

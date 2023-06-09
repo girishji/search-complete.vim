@@ -16,3 +16,8 @@ def! g:SearchCompleteSetup(opts: dict<any>)
     c.options->extend(opts)
 enddef
 
+# SearchComplete
+# SearchCompleteBorderHighlight
+# SearchCompleteScrollbarHighlight
+# SearchCompleteThumbHighlight
+
