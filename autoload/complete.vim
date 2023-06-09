@@ -1,12 +1,9 @@
 vim9script
 
 export var options: dict<any> = {
-    maxHeight: 10,
-    highlight: 'SearchComplete',
-    borderhighlight: 'SearchCompleteBorderHighlight',
-    scrollbarhighlight: 'SearchCompleteScrollbarHighlight',
-    thumbhighlight: 'SearchCompleteThumbHighlight',
-    #borderchars: ['-', '|', '-', '|', '┌', '┐', '┘', '└'],
+    popup: {
+	maxheight: 14,
+    },
 }
 
 # Encapsulate the state and operations of popup menu completion.
@@ -152,6 +149,7 @@ def Menu(popup: dict<any>)
 	p.winid->popup_move({col: p.prefix->strridx(lastword) + 2})
 	p.winid->popup_settext(p.keywords)
 	p.winid->popup_setoptions({cursorline: false})
+	matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
 	p.winid->popup_show()
 	DisableCmdline()
     endif
@@ -181,7 +179,7 @@ def SelectItem(popup: dict<any>, dir: string)
     endif
     clearmatches()
     setcmdline(p.candidates[p.index])
-    'Search'->matchadd(p.prefix)
+    matchadd('Search', p.prefix)
     :redraw
 enddef
 
@@ -195,24 +193,23 @@ def Filter(winid: number, key: string): bool
 	p.selectItem('j') # next item
     elseif key ==# "\<s-tab>" || key ==# "\<c-p>" || key ==# "\<up>"
 	p.selectItem('k') # prev item
+    elseif key ==# "\<c-e>"
+	clearmatches()
+	p.winid->popup_hide()
+	setcmdline('')
+	feedkeys(p.prefix, 'n')
+	:redraw!
+	timer_start(0, (_) => EnableCmdline()) # timer will que this after feedkeys
+    elseif key ==? "\<cr>" || key ==? "\<esc>"
+	p.winid->popup_filter_menu('x')
+	var ret = p.winid->popup_filter_menu(key)
+	EnableCmdline()
+	return ret # <cr> calls callback with result -1 and <esc> with 0
     else
 	clearmatches()
-	if key ==# "\<c-e>"
-	    p.winid->popup_hide()
-	    setcmdline('')
-	    feedkeys(p.prefix, 'n')
-	    :redraw!
-	    timer_start(0, (_) => EnableCmdline()) # timer will que this after feedkeys
-	elseif key ==? "\<cr>" || key ==? "\<esc>"
-	    p.winid->popup_filter_menu('x')
-	    var ret = p.winid->popup_filter_menu(key)
-	    EnableCmdline()
-	    return ret
-	else
-	    p.winid->popup_hide() | :redraw
-	    EnableCmdline()
-	    feedkeys(key, 'n')
-	endif
+	p.winid->popup_hide() | :redraw
+	EnableCmdline()
+	feedkeys(key, 'n')
     endif
     return true
 enddef
@@ -224,7 +221,7 @@ enddef
 def PopupComplete(popup: dict<any>)
     var p = popup
     if p.winid->popup_getoptions() == {} # popup does not exist, create it
-	p.winid = popup_menu([], {
+	var attr = {
 	    cursorline: false, # Do not automatically select the first item
 	    pos: 'botleft',
 	    line: &lines - &cmdheight,
@@ -232,15 +229,16 @@ def PopupComplete(popup: dict<any>)
 	    filtermode: 'c',
 	    filter: Filter,
 	    callback: (winid, result) => {
+		echom 'callback called result ' .. result
+		clearmatches()
 		if result == -1 # popup force closed due to <c-c> or cursor mvmt
 		    p.winid->popup_filter_menu('Esc')
 		    feedkeys("\<c-c>", 'n')
 		endif
 	    },
-	})
-	# }->extend(options, 'force'))
+	}
+	p.winid = popup_menu([], attr->extend(options.popup))
 	p.winid->popup_hide()
-	DisableCmdline() # So that only filter fn of popup consumes keys
     endif
     p.menu()
 enddef
