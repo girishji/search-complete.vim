@@ -1,10 +1,13 @@
 vim9script
 
 export var options: dict<any> = {
+    enable: true,
     popup: {
 	maxheight: 14,
     },
 }
+
+const SearchRangeLineCount = 100
 
 # Encapsulate the state and operations of popup menu completion.
 def NewPopup(searchForward: bool): dict<any>
@@ -27,17 +30,18 @@ enddef
 var popupCompletor = {}
 
 def Init()
-    popupCompletor = getcmdtype() == '/' ? NewPopup(true) : NewPopup(false)
-    # setwinvar(popupCompletor.winid, '&wincolor', 'searchcomplete')
+    if options.enable
+	popupCompletor = getcmdtype() == '/' ? NewPopup(true) : NewPopup(false)
+    endif
 enddef
 
 def Teardown()
-    popupCompletor.winid->popup_close()
+    options.enable ? popupCompletor.winid->popup_close() : true
     popupCompletor = {}
 enddef
 
 def Complete()
-    popupCompletor.complete()
+    options.enable ? popupCompletor.complete() : true
 enddef
 
 export def Setup()
@@ -97,8 +101,8 @@ enddef
 #     return candidates->sort((x, y) => dist[x] < dist[y] ? -1 : 1)
 # enddef
 
-# Match entire prefix (commandline) even if it is multiword. Return a
-# list of matches.
+# Match prefix (commandline) even if it is multiword. Return a list of
+# matches.
 def MatchingStrings(popup: dict<any>): list<any>
     var p = popup
     var matches = []
@@ -122,27 +126,169 @@ def MatchingStrings(popup: dict<any>): list<any>
     return matches->copy()->filter((_, v) => v =~ $'^{p.prefix}') + matches->copy()->filter((_, v) => v !~ $'^{p.prefix}')
 enddef
 
+# def MatchesWorker(popup: dict<any>, range: dict<any>, searchBeginTime: string, timer: number)
+#     var p = popup
+#     if p.searchBeginTime != searchBeginTime
+# 	return
+#     endif
+#     var flags = $'w{p.searchForward ? "" : "b"}' # use 'w' to match pattern under cursor
+#     var pattern = $'\k*{p.prefix}\k*' # XXX: test if \S is better
+#     var stopline = line('$') <= SearchRangeLineCount ? 0 : (line('.') + SearchRangeLineCount) % line('$')
+#     var [lnum, cnum] = pattern->searchpos(flags, stopline)
+#     if [lnum, cnum] == [0, 0]
+# 	if line('$') <= SearchRangeLineCount
+# 	    return
+# 	endif
+# 	# xxx
+# 	return timer_start(0, function(MatchesWorker, [searchBeginTime]))
+#     endif
+#     var [startl, startc] = [lnum, cnum]
+#     while lnum != 0 && cnum != 0
+# 	var mstr = getline(lnum)->strpart(cnum - 1)->substitute($'^\c\(\k*{p.prefix}\k*\).*$', $'\1', '')
+# 	if mstr != p.prefix && !found->has_key(mstr)
+# 	    found[mstr] = 1
+# 	    matches->add(mstr)
+# 	endif
+# 	[lnum, cnum] = pattern->searchpos(flags)
+# 	if startl == lnum && startc == cnum
+# 	    break
+# 	endif
+#     endwhile
+
+# enddef
+
+# def Matches(popup: dict<any>): list<any>
+#     var p = popup
+#     var matches = []
+#     var found = {}
+#     var flags = $'w{p.searchForward ? "" : "b"}' # use 'w' to match pattern under cursor
+#     var pattern = $'\k*{p.prefix}\k*' # XXX: test if \S is better
+
+#     var [lnum, cnum] = pattern->searchpos(flags)
+#     var [startl, startc] = [lnum, cnum]
+#     while lnum != 0 && cnum != 0
+# 	var mstr = getline(lnum)->strpart(cnum - 1)->substitute($'^\c\(\k*{p.prefix}\k*\).*$', $'\1', '')
+# 	if mstr != p.prefix && !found->has_key(mstr)
+# 	    found[mstr] = 1
+# 	    matches->add(mstr)
+# 	endif
+# 	[lnum, cnum] = pattern->searchpos(flags)
+# 	if startl == lnum && startc == cnum
+# 	    break
+# 	endif
+#     endwhile
+#     return matches->copy()->filter((_, v) => v =~ $'^{p.prefix}') + matches->copy()->filter((_, v) => v !~ $'^{p.prefix}')
+# enddef
+
+# def SetStopline(attr: dict<any>): bool
+#     var p = attr.popup
+#     if attr.sartpos[1] == line('.') && col('.') == p.searchForward ? col('$') : 1
+# 	return false # search has wrapped around, nothing more to search
+#     endif
+#     if attr.startpos != getpos('.') # not first search worker attempt
+# 	# start subsequent searches +-5 lines, to cover multiline search
+# 	cursor(line('.') - (p.searchForward ? 5 : -5), 1)
+#     endif
+#     attr.stopline += p.searchForward ? SearchRangeLineCount : -SearchRangeLineCount
+#     if p.searchForward && if attr.stopLine > line('$')
+# 	cursor(1, 1)
+# 	attr.stopline = SearchRangeLineCount
+#     elseif attr.stopLine < 1
+# 	cursor(line('$'), 1)
+# 	attr.stopline = line('$') - SearchRangeLineCount
+#     endif
+#     return true
+# enddef
+
+def SearchIntervals(popup: dict<any>): list<any>
+    var p = popup
+    const Range = 100
+    var intervals = []
+    var startpos = {line: line('.'), col: col('.')}
+    var endpos = startpos
+    var lookback = false # multiline searches at interval boundary needs to include a few lines before start
+    while endpos != {line: p.searchForward ? line('$') : 1, col: strwidth(getline('$'))}
+	var spos = endpos->copy()
+	var stopline = p.searchForward ? min([endpos.line + Range, line('$')]) :  max([endpos.line - Range, line('$')])
+	endpos = {line: stopline, col: strwidth(getline(stopline))}
+	intervals->add([lookback ? {line: spos.line + (p.searchForward ? -5 : 5), col: 1} : spos, stopline])
+	echom $' {intervals[-1][0].line} : {intervals[-1][0].col}, stop: {stopline}'
+	lookback = true
+    endwhile
+    lookback = false
+    endpos = p.searchForward ? {line: 1, col: 1} : {line: line('$'), col: 1}
+    while endpos != {line: startpos.line, col: strwidth(getline(startpos.line))}
+	var spos = endpos->copy()
+	var stopline = p.searchForward ? min([endpos.line + Range, startpos.line]) :  max([endpos.line - Range, startpos.line])
+	endpos = {line: stopline, col: strwidth(getline(stopline))}
+	intervals->add([{line: spos.line + (lookback ? (p.searchForward ? -5 : 5) : 0), col: 1}, stopline])
+	echom $' {intervals[-1][0].line} : {intervals[-1][0].col}, stop: {stopline}'
+	lookback = true
+    endwhile
+    return intervals
+enddef
+
+# def SearchWorker(attr: dict<any>, timer: number)
+#     if reltime(attr.popup.searchStartTime, attr.searchStartTime) < 0 # state search, a new search is in progress
+# 	return
+#     endif
+#     var p = attr.popup
+
+#     var flags = $'w{p.searchForward ? "" : "b"}' # use 'w' to match pattern under cursor
+#     var pattern = $'\k*{p.prefix}\k*' # XXX: test if \S is better
+
+#     if SetStopline(searchWorkerAttr)
+# 	timer_start(0, function(SearchWorker, [searchWorkerAttr]))
+#     endif
+
+# 	# p.candidates = p->MatchingStrings()
+# 	# p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
+#     # if len(p.keywords) > 0
+# 	# var lastword = p.prefix->matchstr('\s*\S\+$')
+# 	# p.winid->popup_move({col: p.prefix->strridx(lastword) + 2})
+# 	# p.winid->popup_settext(p.keywords)
+# 	# p.winid->popup_setoptions({cursorline: false})
+# 	# matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
+# 	# p.winid->popup_show()
+# 	# DisableCmdline()
+#     # endif
+# enddef
+
+# # Display a popup menu if necessary.
+# def Menux(popup: dict<any>)
+#     var p = popup
+#     var p.prefix = getcmdline()->strpart(0, getcmdpos() - 1)
+#     if p.prefix == '' || p.prefix =~ '\s\+$'
+# 	return
+#     endif
+#     p.candidates = {}
+#     p.keywords = {}
+#     p.startTime = reltime()
+#     var searchWorkerAttr = {
+# 	popup: p,
+# 	searttime: p.starttime,
+# 	startpos: getpos('.'),
+# 	stopline: -1,
+#     }
+#     if SetStopline(searchWorkerAttr)
+# 	timer_start(0, function(SearchWorker, [searchWorkerAttr]))
+#     endif
+# enddef
 
 # Display a popup menu if necessary.
 def Menu(popup: dict<any>)
     var p = popup
+    p->SearchIntervals()
     var prefix = getcmdline()->strpart(0, getcmdpos() - 1)
+    var searchStartTime = reltime()
     if prefix !=# p.prefix
 	p.prefix = prefix
 	if p.prefix == '' || p.prefix =~ '\s\+$'
 	    return
 	endif
 	p.candidates = {}
-	if p.prefix !~ '\s'
-	    # p.candidates = p.wordMatch()
-	    if len(p.candidates) > 0
-		p.keywords = p.candidates
-	    endif
-	endif
-	if len(p.candidates) == 0
-	    p.candidates = p->MatchingStrings()
-	    p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
-	endif
+	p.candidates = p->MatchingStrings()
+	p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
     endif
     if len(p.keywords) > 0
 	var lastword = p.prefix->matchstr('\s*\S\+$')
@@ -229,7 +375,6 @@ def PopupComplete(popup: dict<any>)
 	    filtermode: 'c',
 	    filter: Filter,
 	    callback: (winid, result) => {
-		echom 'callback called result ' .. result
 		clearmatches()
 		if result == -1 # popup force closed due to <c-c> or cursor mvmt
 		    p.winid->popup_filter_menu('Esc')

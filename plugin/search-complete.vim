@@ -22,6 +22,12 @@ def! g:SearchCompleteSetup(opts: dict<any>)
     endif
 enddef
 
+def SearchCompleteEnable(flag: bool)
+    c.options.enable = flag
+enddef
+command! SearchCompleteEnable  SearchCompleteEnable(true)
+command! SearchCompleteDisable SearchCompleteEnable(false)
+
 # SearchComplete
 # SearchCompleteBorderHighlight
 # SearchCompleteScrollbarHighlight
