@@ -22,14 +22,8 @@ enddef
 command! SearchCompleteEnable  SearchCompleteEnable(true)
 command! SearchCompleteDisable SearchCompleteEnable(false)
 
-# SearchComplete
-# SearchCompleteBorderHighlight
-# SearchCompleteScrollbarHighlight
-# SearchCompleteThumbHighlight
-# borderhighlight: 'SearchCompleteBorderHighlight',
-# scrollbarhighlight: 'SearchCompleteScrollbarHighlight',
-# thumbhighlight: 'SearchCompleteThumbHighlight',
-# hi SearchComplete ctermbg=none
-
 hi! link SearchComplete		Pmenu
 hi! link SearchCompletePrefix	Statement
+hi! link SearchCompleteBorder   Pmenu
+hi! link SearchCompleteSbar	PmenuSbar
+hi! link SearchCompleteThumb	PmenuThumb

@@ -5,6 +5,9 @@ export var options: dict<any> = {
     timeout: 100, # millisec
     maxheight: 12,
     highlight: 'SearchComplete',
+    borderhighlight: 'SearchCompleteBorder',
+    scrollbarhighlight: 'SearchCompleteSbar',
+    thumbhighlight: 'SearchCompleteThumb',
 }
 
 def PopupOptions(): dict<any>
