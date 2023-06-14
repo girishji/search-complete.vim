@@ -86,7 +86,7 @@ def MatchingStrings(popup: dict<any>): list<any>
     var pattern = $'\k*{p.prefix}\k*' # XXX: test if \S is better
 
     var start = reltime()
-    var [lnum, cnum] = pattern->searchpos(flags)
+    var [lnum, cnum] = pattern->searchpos(flags, 0, options.timeout)
     var [startl, startc] = [lnum, cnum]
     while lnum != 0 && cnum != 0
 	var mstr = getline(lnum)->strpart(cnum - 1)->substitute($'^\c\(\k*{p.prefix}\k*\).*$', $'\1', '')
@@ -94,7 +94,7 @@ def MatchingStrings(popup: dict<any>): list<any>
 	    found[mstr] = 1
 	    matches->add(mstr)
 	endif
-	[lnum, cnum] = pattern->searchpos(flags)
+	[lnum, cnum] = pattern->searchpos(flags, 0, options.timeout)
 	if (startl == lnum && startc == cnum) || (start->reltime()->reltimefloat() * 1000) > options.timeout
 	    break
 	endif
