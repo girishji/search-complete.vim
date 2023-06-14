@@ -24,6 +24,5 @@ command! SearchCompleteDisable SearchCompleteEnable(false)
 
 hi! link SearchComplete		Pmenu
 hi! link SearchCompletePrefix	Statement
-hi! link SearchCompleteBorder   Pmenu
 hi! link SearchCompleteSbar	PmenuSbar
 hi! link SearchCompleteThumb	PmenuThumb
