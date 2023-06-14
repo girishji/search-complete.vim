@@ -13,13 +13,7 @@ import autoload '../autoload/complete.vim' as c
 c.Setup()
 
 def! g:SearchCompleteSetup(opts: dict<any>)
-    if opts->has_key('popup')
-	var popts = c.options.popup->extend(opts.popup)
-	c.options->extend(opts)
-	c.opts.popup = popts
-    else
-	c.options->extend(opts)
-    endif
+    c.options->extend(opts)
 enddef
 
 def SearchCompleteEnable(flag: bool)
@@ -32,9 +26,10 @@ command! SearchCompleteDisable SearchCompleteEnable(false)
 # SearchCompleteBorderHighlight
 # SearchCompleteScrollbarHighlight
 # SearchCompleteThumbHighlight
-	# borderhighlight: 'SearchCompleteBorderHighlight',
-	# scrollbarhighlight: 'SearchCompleteScrollbarHighlight',
-	# thumbhighlight: 'SearchCompleteThumbHighlight',
+# borderhighlight: 'SearchCompleteBorderHighlight',
+# scrollbarhighlight: 'SearchCompleteScrollbarHighlight',
+# thumbhighlight: 'SearchCompleteThumbHighlight',
 # hi SearchComplete ctermbg=none
 
-hi! link SearchCompletePrefix Statement
+hi! link SearchComplete		Pmenu
+hi! link SearchCompletePrefix	Statement
