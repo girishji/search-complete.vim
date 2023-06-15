@@ -4,7 +4,7 @@ export var options: dict<any> = {
     enable: true,
     timeout: 100, # millisec
     maxheight: 12,
-    highlight: 'SearchComplete',
+    highlight: 'SearchCompleteMenu',
     scrollbarhighlight: 'SearchCompleteSbar',
     thumbhighlight: 'SearchCompleteThumb',
 }
@@ -88,16 +88,24 @@ def MatchingStrings(popup: dict<any>): list<any>
     var pattern = $'\k*{p.prefix}\k*' # XXX: test if \S is better
 
     var start = reltime()
-    var [lnum, cnum] = pattern->searchpos(flags, 0, options.timeout)
-    var [startl, startc] = [lnum, cnum]
-    while lnum != 0 && cnum != 0
-	var mstr = getline(lnum)->strpart(cnum - 1)->substitute($'^\c\(\k*{p.prefix}\k*\).*$', $'\1', '')
+    var [bline, bcol] = pattern->searchpos(flags, 0, options.timeout)
+    var [startl, startc] = [bline, bcol]
+    while [bline, bcol] != [0, 0]
+	var [eline, ecol] = pattern->searchpos('ceW') # end of matching string
+	var lines = getline(bline, eline)
+	var mstr = ''
+	if lines->len() == 1
+	    mstr = lines[0]->strpart(bcol - 1, ecol - bcol + 1)
+	else
+	    var mlist = [lines[0]->strpart(bcol - 1)] + lines[1 : -2] + [lines[-1]->strpart(0, ecol)]
+	    mstr = mlist->join('\n')
+	endif
 	if mstr != p.prefix && !found->has_key(mstr)
 	    found[mstr] = 1
 	    matches->add(mstr)
 	endif
-	[lnum, cnum] = pattern->searchpos(flags, 0, options.timeout)
-	if (startl == lnum && startc == cnum) || (start->reltime()->reltimefloat() * 1000) > options.timeout
+	[bline, bcol] = pattern->searchpos(flags, 0, options.timeout)
+	if (startl == bline && startc == bcol) || (start->reltime()->reltimefloat() * 1000) > options.timeout
 	    break
 	endif
     endwhile
@@ -111,21 +119,21 @@ def ShowMenu(popup: dict<any>)
     var searchStartTime = reltime()
     if prefix !=# p.prefix
 	p.prefix = prefix
-	if p.prefix == '' || p.prefix =~ '\s\+$'
+	if p.prefix == '' || p.prefix =~ '^\s\+$'
 	    return
 	endif
 	p.candidates = []
 	p.candidates = p->MatchingStrings()
-	p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
-    endif
-    if len(p.keywords) > 0
-	var lastword = p.prefix->matchstr('\s*\S\+$')
-	p.winid->popup_move({col: p.prefix->strridx(lastword) + 2})
-	p.winid->popup_settext(p.keywords)
-	p.winid->popup_setoptions({cursorline: false})
-	matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
-	p.winid->popup_show()
-	DisableCmdline()
+	p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\_s*\zs\S\+$'))
+	if len(p.keywords) > 0
+	    var lastword = p.prefix->matchstr('\s*\S\+$')
+	    p.winid->popup_move({col: p.prefix->strridx(lastword) + 2})
+	    p.winid->popup_settext(p.keywords)
+	    p.winid->popup_setoptions({cursorline: false})
+	    matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
+	    p.winid->popup_show()
+	    DisableCmdline()
+	endif
     endif
 enddef
 
