@@ -22,7 +22,7 @@ enddef
 command! SearchCompleteEnable  SearchCompleteEnable(true)
 command! SearchCompleteDisable SearchCompleteEnable(false)
 
-hi! link SearchCompleteMenu	Pmenu
-hi! link SearchCompletePrefix	Statement
-hi! link SearchCompleteSbar	PmenuSbar
-hi! link SearchCompleteThumb	PmenuThumb
+highlight default link SearchCompleteMenu	Pmenu
+highlight default link SearchCompletePrefix	Statement
+highlight default link SearchCompleteSbar	PmenuSbar
+highlight default link SearchCompleteThumb	PmenuThumb

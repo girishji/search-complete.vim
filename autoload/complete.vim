@@ -54,28 +54,18 @@ enddef
 
 export def Setup()
     augroup SearchComplete | autocmd!
-	autocmd CmdlineEnter /,\? Init()
+	autocmd CmdlineEnter /,\?   Init()
 	autocmd CmdlineChanged /,\? Complete()
-	autocmd CmdlineLeave /,\? Teardown()
+	autocmd CmdlineLeave /,\?   Teardown()
     augroup END
 enddef
 
 def EnableCmdline()
-    [{
-	group: 'SearchComplete',
-	event: 'CmdlineChanged',
-	pattern: ['/', '\?'],
-	cmd: 'Complete()',
-	replace: true,
-    }]->autocmd_add()
+    autocmd SearchComplete CmdlineChanged /,\? Complete()
 enddef
 
 def DisableCmdline()
-    [{
-	group: 'SearchComplete',
-	event: 'CmdlineChanged',
-	pattern: ['/', '\?'],
-    }]->autocmd_delete()
+    autocmd! SearchComplete CmdlineChanged /,\?
 enddef
 
 # Match prefix (commandline) even if it is multiword. Return a list of
@@ -130,6 +120,7 @@ def ShowMenu(popup: dict<any>)
 	    p.winid->popup_move({col: p.prefix->strridx(lastword) + 2})
 	    p.winid->popup_settext(p.keywords)
 	    p.winid->popup_setoptions({cursorline: false})
+	    clearmatches(p.winid)
 	    matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
 	    p.winid->popup_show()
 	    DisableCmdline()
@@ -164,10 +155,9 @@ def SelectItem(popup: dict<any>, dir: string)
     :redraw
 enddef
 
-# Filter function receives keys when popup is not hidden. It handles special
-# keys for scrolling popup menu, accepting/dismissing selection, etc.
-# Other keys are fed back to Vim's main loop (through feedkeys) for the
-# autocommand (CmdlineChanged) to consume.
+# Filter function receives keys when popup is shown. It handles special
+# keys for scrolling/dismissing popup menu. Other keys are fed back to Vim's
+# main loop (through feedkeys).
 def Filter(winid: number, key: string): bool
     var p = popupCompletor
     if key ==# "\<tab>" || key ==# "\<c-n>" || key ==# "\<down>"
@@ -221,4 +211,5 @@ def CompleteWord(popup: dict<any>)
 	p.winid->popup_hide()
     endif
     p.showMenu()
+    # timer_start(0, (_) => p.showMenu())
 enddef
