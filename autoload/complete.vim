@@ -26,7 +26,7 @@ def NewPopup(isForwardSearch: bool): dict<any>
     popup->extend({
 	completeWord: function(CompleteWord, [popup]),
 	selectItem: function(SelectItem, [popup]),
-	showMenu: function(ShowMenu, [popup]),
+	updateMenu: function(UpdateMenu, [popup]),
     })
     return popup
 enddef
@@ -103,9 +103,10 @@ def MatchingStrings(popup: dict<any>): list<any>
 enddef
 
 # Display a popup menu if necessary.
-def ShowMenu(popup: dict<any>)
+def UpdateMenu(popup: dict<any>, key: string)
+    echom 'showMenu called'
     var p = popup
-    var prefix = getcmdline()->strpart(0, getcmdpos() - 1)
+    var prefix = getcmdline()->strpart(0, getcmdpos() - 1) .. key
     var searchStartTime = reltime()
     if prefix !=# p.prefix
 	p.prefix = prefix
@@ -129,18 +130,18 @@ def ShowMenu(popup: dict<any>)
 enddef
 
 # Select next/prev item in popup menu; wrap around at end of list.
-def SelectItem(popup: dict<any>, dir: string)
+def SelectItem(popup: dict<any>, direction: string)
     var p = popup
     var count = p.keywords->len()
     if p.winid->popup_getoptions().cursorline
-	if p.index == (dir ==# 'j' ? count - 1 : 0)
+	if p.index == (direction ==# 'j' ? count - 1 : 0)
 	    for _ in range(count - 1)
-		p.winid->popup_filter_menu(dir ==# 'j' ? 'k' : 'j')
+		p.winid->popup_filter_menu(direction ==# 'j' ? 'k' : 'j')
 	    endfor
-	    p.index = (dir ==# 'j' ? 0 : count - 1)
+	    p.index = (direction ==# 'j' ? 0 : count - 1)
 	else
-	    p.winid->popup_filter_menu(dir)
-	    p.index += (dir ==# 'j' ? 1 : -1)
+	    p.winid->popup_filter_menu(direction)
+	    p.index += (direction ==# 'j' ? 1 : -1)
 	endif
     else
 	p.winid->popup_setoptions({cursorline: true})
@@ -172,24 +173,25 @@ def Filter(winid: number, key: string): bool
 	:redraw!
 	timer_start(0, (_) => EnableCmdline()) # timer will que this after feedkeys
     elseif key ==? "\<cr>" || key ==? "\<esc>"
-	p.winid->popup_filter_menu('x')
+	p.winid->popup_filter_menu('x') # <cr> callback called with result -1 (<cr>) and 0 (<esc>)
 	var ret = p.winid->popup_filter_menu(key)
 	EnableCmdline()
-	return ret # <cr> calls callback with result -1 and <esc> with 0
+	return ret
     else
 	clearmatches()
 	p.winid->popup_hide() | :redraw
 	EnableCmdline()
-	feedkeys(key, 'n')
+	p.updateMenu(key)
+	return false # Let vim's usual mechanism (search highlighting) handle this
     endif
     return true
 enddef
 
 # Create a popup if necessary. When popup is not hidden the 'filter' function
 # consumes the keys. When popup is not yet created or if it is hidden
-# autocommand (tied to CmdlineChanged) handles the input keys. These two
-# mechanisms are kept mutually exclusive by enabling and disabling autocommand.
+# autocommand (tied to CmdlineChanged) handles the input keys.
 def CompleteWord(popup: dict<any>)
+    echom 'completeWord called'
     var p = popup
     if p.winid->popup_getoptions() == {} # popup does not exist, create it
 	var attr = {
@@ -210,6 +212,6 @@ def CompleteWord(popup: dict<any>)
 	p.winid = popup_menu([], attr->extend(PopupOptions()))
 	p.winid->popup_hide()
     endif
-    p.showMenu()
-    # timer_start(0, (_) => p.showMenu())
+    p.updateMenu('')
+    # timer_start(0, (_) => p.updateMenu(''))
 enddef
