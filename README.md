@@ -21,10 +21,10 @@ This is the default since it does not cover text in input area.
 # Features
 
 1. Does not interfere with `c|d|y /pattern` commands.
-1. Async search does not get bogged down when searching large files.
+1. Search command does not get bogged down when searching large files.
 1. Respects forward (`/`) and reverse (`?`) search when displaying menu items.
 1. Does not interfere with search-history recall (arrow keys are not mapped).
-1. Switch between vertical popup menu and (unobtrusive) horizontal menu (overlayed on statusline).
+1. Switch between vertical popup menu and (unobtrusive) horizontal menu (overlay on statusline).
 1. Can search across space and newline characters (multi-line search).
 1. Does not interfere with search-highlighting and incremental-search.
 1. Fully customizable colors and popup menu options.
@@ -74,7 +74,7 @@ var options: dict<any> = {
 }
 ```
 
-You can also disable and re-enabnle this plugin through commands: `SearchCompleteDisable` and `SearchCompleteEnable`.
+You can also disable and re-enable this plugin through commands: `SearchCompleteDisable` and `SearchCompleteEnable`.
 
 ### Highlight Groups
 
