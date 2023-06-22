@@ -113,3 +113,8 @@ keystrokes are allowed to be queued into Vim's main loop.
 
 Pull requests are welcome.
 
+# Similar Plugins
+
+- [cmp-cmdline](https://github.com/hrsh7th/cmp-cmdline)
+- [wilder.nvim](https://github.com/gelguy/wilder.nvim)
+- [sherlock](https://github.com/vim-scripts/sherlock.vim)
