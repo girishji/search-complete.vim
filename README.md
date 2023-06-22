@@ -79,9 +79,12 @@ var options: dict<any> = {
 }
 ```
 
-You can also disable and re-enable this plugin through commands: `SearchCompleteDisable` and `SearchCompleteEnable`.
+Disable and re-enable this plugin through commands:
 
-You can also hide statusline when popup menu is shown:
+- `SearchCompleteDisable`
+- `SearchCompleteEnable`
+
+Hide statusline when popup menu is shown:
 
 ```
 autocmd CmdlineEnter /,\? set laststatus=0 noshowmode noruler
