@@ -43,10 +43,20 @@ This is the default choice since it does not cover up text in main window.
 Install using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```
+vim9script
+
+plug#begin()
+
 Plug 'girishji/search-complete.vim'
+
+plug#end()
 ```
 
 Or use Vim's builtin package manager.
+
+```
+git clone --depth 1 https://github.com/girishji/search-complete.vim ~/.vim/pack/plugins/start/search-complete.vim
+```
 
 # Configuration
 
