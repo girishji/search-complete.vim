@@ -68,9 +68,9 @@ Other options of interest:
 
 ```
 var options: dict<any> = {
-    maxheight: 12,              # line count of vertical menu
-    horizontalMenu: true,       # single line horizontal menu
-    searchRange: 1000,          # line count per search iteration
+    maxheight: 12,              # Line count of vertical menu
+    horizontalMenu: true,       # 'true' for horizontal menu, 'false' for vertical menu
+    searchRange: 1000,          # Lines per search iteration
 }
 ```
 
