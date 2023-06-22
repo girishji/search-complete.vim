@@ -81,8 +81,8 @@ var options: dict<any> = {
 
 Disable and re-enable this plugin through commands:
 
-- `SearchCompleteDisable`
-- `SearchCompleteEnable`
+- `:SearchCompleteDisable`
+- `:SearchCompleteEnable`
 
 Hide statusline when popup menu is shown:
 
