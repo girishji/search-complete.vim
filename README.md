@@ -93,9 +93,9 @@ autocmd CmdlineLeave /,\? set laststatus=2 showmode ruler
 
 ### Highlight Groups
 
-Customize the colors to your liking using these highlight groups.
+Customize the colors to your liking using highlight groups.
 
-- `SearchCompleteMenu`: Menu items inside the popup menu, linked to `Pmenu`.
+- `SearchCompleteMenu`: Menu items in popup menu, linked to `Pmenu`.
 - `SearchCompleteSelect`: Selected item, linked to `PmenuSel`.
 - `SearchCompletePrefix`: Fragment of menu item that matches text typed in command-line, linked to `Statement`.
 - `SearchCompleteSbar`: Vertical menu scroll bar, linked to `PmenuSbar`.
