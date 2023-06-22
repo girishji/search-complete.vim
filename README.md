@@ -2,10 +2,13 @@
 
 Async search mode completion with popup menu. Vim only, no Neovim for now.
 
-- Search using `/` or `?`. 
+- Search using `/` or `?`.
 - `<Tab>` and `<Shift-tab>` will select menu items.
 - `<Ctrl-e>` dismisses popup menu.
-- `Enter` to accept selection, and `<Esc>` to dismiss search. 
+- `Enter` to accept selection, and `<Esc>` to dismiss search.
+- `<Ctrl-c>` will force close popup menu.
+- Type `Space` after the first word to include the second word in search.
+- Type `\n` at the end of last word to continue to next line.
 
 ### Vertical Popup Menu
 
@@ -14,7 +17,7 @@ Async search mode completion with popup menu. Vim only, no Neovim for now.
 
 ### Horizontal Popup Menu
 
-This is the default since it does not cover text in input area.
+This is the default choice since it does not cover up text in main window.
 
 [![asciicast](https://asciinema.org/a/DrvlJnoumCA9jWuMH8WGBCVJz.svg)](https://asciinema.org/a/DrvlJnoumCA9jWuMH8WGBCVJz)
 
@@ -54,7 +57,8 @@ popup_create() can be configured. This includes `borderchars`, `border`, `maxhei
 
 `g:SearchCompleteSetup()` function is used to set options. It takes a dictionary argument.
 If you are using
-[vim-plug](https://github.com/junegunn/vim-plug) to install this plugin, use `autocmd` to set options:
+[vim-plug](https://github.com/junegunn/vim-plug), use `autocmd` to set options
+(after calling `Plug`):
 
 ```
 augroup MySearchComplete | autocmd!

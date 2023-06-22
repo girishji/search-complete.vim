@@ -25,8 +25,8 @@ def NewPopup(isForwardSearch: bool): dict<any>
 	winid: -1,	    # id of popup window
 	keywords: [],	    # keywords shown in popup menu
 	candidates: [],	    # candidates for completion (could be phrases)
-	index: 0,			# index to keywords and candidates array
-	prefix: '',			# cached cmdline contents
+	index: 0,	    # index to keywords and candidates array
+	prefix: '',	    # cached cmdline contents
 	isForwardSearch: isForwardSearch,	# true for '/' and false for '?'
 	searchStartTime: [],		# timestamp at which search started
 	firstMatchPos: [],  # workaround for vim bug 12538
@@ -187,6 +187,9 @@ def ShowPopupMenu(popup: dict<any>)
     clearmatches(p.winid)
     matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
     p.winid->popup_show()
+    if !&incsearch # redraw only when noincsearch, otherwise highlight flickers
+       redraw
+    endif
     DisableCmdline()
 enddef
 
@@ -202,16 +205,14 @@ def SearchWorker(popup: dict<any>, attr: dict<any>, timer: number)
     var interval = attr.intervals[attr.index]
     var cursorpos = [line('.'), col('.')]
     cursor(interval.startl, interval.startc)
-
     var matches = p.matchingStrings(interval)
+    cursor(cursorpos)
 
     # Add matched fragments to list of candidates and segregate
     var candidates = timediff > 0 ? matches : p.candidates + matches
     p.candidates = candidates->copy()->filter((_, v) => v =~ $'^{p.prefix}') +
 	candidates->copy()->filter((_, v) => v !~ $'^{p.prefix}')
     p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
-
-    cursor(cursorpos)
 
     if len(p.keywords) > 0
 	p.showPopupMenu()
@@ -250,7 +251,9 @@ def UpdateMenu(popup: dict<any>, key: string)
 	}
 	p->SearchWorker(searchWorkerAttr, 0)
     else
+	var cursorpos = [line('.'), col('.')]
 	var matches = p.matchingStrings({})
+	cursor(cursorpos)
 	p.candidates = matches->copy()->filter((_, v) => v =~ $'^{p.prefix}') +
 	    matches->copy()->filter((_, v) => v !~ $'^{p.prefix}')
 	p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
