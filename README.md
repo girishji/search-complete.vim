@@ -48,7 +48,7 @@ Or use Vim's builtin package manager.
 # Configuration
 
 There are two types of options that can be configured: 1) options passed directly to Vim's
-`[popup_create()](https://vimhelp.org/popup.txt.html#popup_create-arguments)` function, like
+[popup_create()](https://vimhelp.org/popup.txt.html#popup_create-arguments) function, like
 `borderchars`, `maxheight`, etc., and 2) options used internally by this plugin.
 
 `g:SearchCompleteSetup()` function is used to set options. It takes a dictionary argument.
