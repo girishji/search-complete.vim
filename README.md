@@ -81,6 +81,13 @@ var options: dict<any> = {
 
 You can also disable and re-enable this plugin through commands: `SearchCompleteDisable` and `SearchCompleteEnable`.
 
+You can also hide statusline when popup menu is shown:
+
+```
+autocmd CmdlineEnter /,\? set laststatus=0 noshowmode noruler
+autocmd CmdlineLeave /,\? set laststatus=2 showmode ruler
+```
+
 ### Highlight Groups
 
 Customize the colors to your liking using these highlight groups.
