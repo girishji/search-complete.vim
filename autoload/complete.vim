@@ -114,7 +114,7 @@ enddef
 # Return a list of strings (can have spaces and newlines) that match the pattern
 def MatchingStrings(popup: dict<any>, interval: dict<any>): list<any>
     var p = popup
-    var flags = p.async ? (p.isForwardSearch ? '' : 'b') : $'w{p.isForwardSearch ? "" : "b"}'
+    var flags = p.async ? (p.isForwardSearch ? '' : 'b') : (p.isForwardSearch ? 'w' : 'wb')
     if p.async && p.firstMatchPos == [] # find first match to highlight (vim bug 12538)
 	var [lnum, cnum] = p.prefix->searchpos(flags, interval.stopl)
 	if [lnum, cnum] != [0, 0]
@@ -150,6 +150,7 @@ def MatchingStrings(popup: dict<any>, interval: dict<any>): list<any>
 	    found[mstr] = 1
 	    matches->add(mstr)
 	endif
+	cursor(lnum, cnum) # restore cursor to beginning of pattern, otherwise '?' does not work
 	[lnum, cnum] = p.async ? pattern->searchpos(flags, interval.stopl) :
 	    pattern->searchpos(flags, 0, options.timeout)
 
@@ -358,11 +359,11 @@ enddef
 def Filter(winid: number, key: string): bool
     var p = popupCompletor
     # Note: do not include arrow keys or <c-n> <c-p> since they are used for history lookup
-    if key ==# "\<tab>"
+    if key ==? "\<tab>"
 	p.selectItem('j') # next item
-    elseif key ==# "\<s-tab>"
+    elseif key ==? "\<s-tab>"
 	p.selectItem('k') # prev item
-    elseif key ==# "\<c-e>"
+    elseif key ==? "\<c-e>"
 	clearmatches()
 	p.winid->popup_hide()
 	setcmdline('')
