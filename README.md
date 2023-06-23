@@ -23,16 +23,16 @@ This is the default choice since it does not cover up text in main window.
 
 # Features
 
-1. Does not interfere with `c|d|y /pattern` commands.
-1. Search command does not get bogged down when searching large files.
-1. Respects forward (`/`) and reverse (`?`) search when displaying menu items.
-1. Does not interfere with search-history recall (arrow keys are not mapped).
-1. Switch between vertical popup menu and (unobtrusive) horizontal menu (overlay on statusline).
-1. Can search across space and newline characters (multi-line search).
-1. Does not interfere with search-highlighting and incremental-search.
-1. Fully customizable colors and popup menu options.
-1. Only `<tab>` and `<s-tab>` are mapped (to choose menu options) in cmdline-mode.
-1. Written entirely in Vim9script for speed.
+- Does not interfere with `c|d|y /pattern` commands.
+- Search command does not get bogged down when searching large files.
+- Respects forward (`/`) and reverse (`?`) search when displaying menu items.
+- Does not interfere with search-history recall (arrow keys are not mapped).
+- Switch between vertical popup menu and horizontal menu (overlay on statusline).
+- Can search across space and newline characters (multi-line search).
+- Does not interfere with search-highlighting and incremental-search.
+- Fully customizable colors and popup menu options.
+- Only `<tab>` and `<shift-tab>` are mapped in cmdline-mode.
+- Written in Vim9script for speed.
 
 # Requirements
 
@@ -52,18 +52,24 @@ Plug 'girishji/search-complete.vim'
 plug#end()
 ```
 
-Or use Vim's builtin package manager.
+Legacy script:
 
 ```
-git clone --depth 1 https://github.com/girishji/search-complete.vim ~/.vim/pack/plugins/start/search-complete.vim
+call plug#begin()
+
+Plug 'girishji/search-complete.vim'
+
+call plug#end()
 ```
+
+Or use Vim's builtin package manager.
 
 # Configuration
 
 There are two types of options that can be configured: 1) options passed directly to Vim's
 [popup_create()](https://vimhelp.org/popup.txt.html#popup_create-arguments)
 function, and 2) options used internally by this plugin. Any option accepted by
-popup_create() can be configured. This includes `borderchars`, `border`, `maxheight`, etc.
+popup_create() is allowed. This includes `borderchars`, `border`, `maxheight`, etc.
 
 `g:SearchCompleteSetup()` function is used to set options. It takes a dictionary argument.
 If you are using
@@ -94,7 +100,7 @@ Disable and re-enable this plugin through commands:
 - `:SearchCompleteDisable`
 - `:SearchCompleteEnable`
 
-Hide statusline when popup menu is shown:
+Hide statusline when popup menu is shown if it bothers you:
 
 ```
 autocmd CmdlineEnter /,\? set laststatus=0 noshowmode noruler
@@ -107,14 +113,14 @@ Customize the colors to your liking using highlight groups.
 
 - `SearchCompleteMenu`: Menu items in popup menu, linked to `Pmenu`.
 - `SearchCompleteSelect`: Selected item, linked to `PmenuSel`.
-- `SearchCompletePrefix`: Fragment of menu item that matches text typed in command-line, linked to `Statement`.
+- `SearchCompletePrefix`: Fragment of menu item that matches text being searched, linked to `Statement`.
 - `SearchCompleteSbar`: Vertical menu scroll bar, linked to `PmenuSbar`.
 - `SearchCompleteThumb`: Vertical menu scroll bar thumb, linked to `PmenuThumb`.
 
 
 # Performance
 
-Great care is taken to ensure that response does not deteriorate when searching
+Great care is taken to ensure that responsiveness does not deteriorate when searching
 large files. Large files are searched in installments. Each search attempt is
 limited to 1000 lines (configurable). Between each search attempt input
 keystrokes are allowed to be queued into Vim's main loop.

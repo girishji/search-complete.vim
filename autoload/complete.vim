@@ -16,6 +16,9 @@ def PopupOptions(): dict<any>
     if options.horizontalMenu && !options->has_key('border')
 	options.border = [0, 0, 0, 0]
     endif
+    if options.searchRange < 10
+	options.searchRange = 10
+    endif
     return options->copy()->filter((k, _) => k !~ 'enable\|horizontalMenu\|searchRange\|timeout\|async')
 enddef
 
