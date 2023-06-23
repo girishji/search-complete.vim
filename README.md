@@ -71,12 +71,12 @@ If you are using
 augroup MySearchComplete | autocmd!
     autocmd WinEnter,BufEnter * g:SearchCompleteSetup({
                 \   borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-                \   horizontalMenu: true,
+                \   horizontalMenu: false,
                 \ })
 augroup END
 ```
 
-Other options of interest:
+Options of interest:
 
 ```
 var options: dict<any> = {
