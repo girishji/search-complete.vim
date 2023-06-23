@@ -24,6 +24,6 @@ command! SearchCompleteDisable SearchCompleteEnable(false)
 
 highlight default link SearchCompleteMenu	Pmenu
 highlight default link SearchCompleteSelect	PmenuSel
-highlight default link SearchCompletePrefix	Statement
+highlight default link SearchCompletePrefix	Question
 highlight default link SearchCompleteSbar	PmenuSbar
 highlight default link SearchCompleteThumb	PmenuThumb
