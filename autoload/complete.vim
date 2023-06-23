@@ -6,10 +6,10 @@ export var options: dict<any> = {
     highlight: 'SearchCompleteMenu',
     scrollbarhighlight: 'SearchCompleteSbar',
     thumbhighlight: 'SearchCompleteThumb',
-    horizontalMenu: true,			# single line horizontal menu
+    horizontalMenu: true,			# 'true' for horizontal menu, 'false' for vertical menu
     searchRange: 1000,				# line count per search attemp
     timeout: 100,				# millisec to search, when non-async is specified
-    async: true,
+    async: true,				# async search
 }
 
 def PopupOptions(): dict<any>
