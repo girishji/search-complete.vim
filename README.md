@@ -1,6 +1,7 @@
 # search-complete.vim
 
-Async search mode completion with popup menu. Vim only, no Neovim for now.
+Async search mode completion with popup menu for Vim. Once you start using it
+you'll not want to go back.
 
 - Search using `/` or `?`.
 - `<Tab>` and `<Shift-tab>` will select menu items.
@@ -17,7 +18,7 @@ Async search mode completion with popup menu. Vim only, no Neovim for now.
 
 ### Horizontal Popup Menu
 
-This is the default choice since it does not cover up text in main window.
+This is the default choice since it leaves the main window fully visible.
 
 [![asciicast](https://asciinema.org/a/DrvlJnoumCA9jWuMH8WGBCVJz.svg)](https://asciinema.org/a/DrvlJnoumCA9jWuMH8WGBCVJz)
 
