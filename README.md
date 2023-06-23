@@ -100,12 +100,6 @@ Disable and re-enable this plugin through commands:
 - `:SearchCompleteDisable`
 - `:SearchCompleteEnable`
 
-Hide statusline when popup menu is shown if it bothers you:
-
-```
-autocmd CmdlineEnter /,\? set laststatus=0 noshowmode noruler
-autocmd CmdlineLeave /,\? set laststatus=2 showmode ruler
-```
 
 ### Highlight Groups
 
