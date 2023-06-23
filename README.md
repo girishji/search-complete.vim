@@ -27,7 +27,7 @@ This is the default choice since it leaves the main window fully visible.
 - Does not interfere with `c|d|y /pattern` commands.
 - Search command does not get bogged down when searching large files.
 - Respects forward (`/`) and reverse (`?`) search when displaying menu items.
-- Does not interfere with search-history recall (arrow keys are not mapped).
+- Does not interfere with search-history recall (arrow keys, <Ctrl-N/P> are not mapped).
 - Switch between vertical popup menu and horizontal menu (overlay on statusline).
 - Can search across space and newline characters (multi-line search).
 - Does not interfere with search-highlighting and incremental-search.
