@@ -52,16 +52,6 @@ Plug 'girishji/search-complete.vim'
 plug#end()
 ```
 
-Legacy script:
-
-```
-call plug#begin()
-
-Plug 'girishji/search-complete.vim'
-
-call plug#end()
-```
-
 Or use Vim's builtin package manager.
 
 # Configuration
