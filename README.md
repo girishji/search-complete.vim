@@ -5,9 +5,9 @@ you'll not want to go back.
 
 - Search using `/` or `?`.
 - `<Tab>` and `<Shift-tab>` will select menu items.
-- `<Ctrl-e>` dismisses popup menu.
+- `<Ctrl-E>` dismisses popup menu.
 - `Enter` to accept selection, and `<Esc>` to dismiss search.
-- `<Ctrl-c>` will force close popup menu.
+- `<Ctrl-C>` will force close popup menu.
 - Type `Space` after the first word to include the second word in search.
 - Type `\n` at the end of last word to continue to next line.
 
@@ -60,12 +60,13 @@ Or use Vim's builtin package manager.
 There are two types of options that can be configured: 1) options passed directly to Vim's
 [popup_create()](https://vimhelp.org/popup.txt.html#popup_create-arguments)
 function, and 2) options used internally by this plugin. Any option accepted by
-popup_create() is allowed. This includes `borderchars`, `border`, `maxheight`, etc.
+popup_create() is allowed. This includes `borderchars`, `border`, `maxheight`,
+etc. See `:h popup_create-arguments`.
 
 `g:SearchCompleteSetup()` function is used to set options. It takes a dictionary argument.
 If you are using
 [vim-plug](https://github.com/junegunn/vim-plug), use `autocmd` to set options
-(after calling `Plug`):
+(after calling `Plug`).
 
 ```
 augroup MySearchComplete | autocmd!
@@ -78,18 +79,15 @@ augroup END
 
 Options of interest:
 
-```
-var options: dict<any> = {
-    maxheight: 12,              # Line count of vertical menu
-    horizontalMenu: true,       # 'true' for horizontal menu, 'false' for vertical menu
-    searchRange: 1000,          # Lines per search iteration
-}
-```
+- `maxheight`: Line count of vertical menu, defaults to 12 lines.
+- `horizontalMenu` : 'true' for horizontal menu, 'false' for vertical menu. Defaults to true.
+- `searchRange`: Lines per search iteration, defaults to 1000 lines.
+- `border`: To disable border set this to `[0, 0, 0, 0]`.
 
-Disable and re-enable this plugin through commands:
+### Commands to Enable and Disable Search Completion
 
-- `:SearchCompleteDisable`
 - `:SearchCompleteEnable`
+- `:SearchCompleteDisable`
 
 
 ### Highlight Groups
