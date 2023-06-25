@@ -1,16 +1,23 @@
 # search-complete.vim
 
-Async search mode autocompletion for Vim. Target words to search for with fewer
-keystrokes. Preview searchable words in a popup. Search multiple words even
-across line boundary. Unobtrusive and does not interfere with Vim's idioms.
+Async search mode auto-completion plugin for Vim. 
+
+__How it helps?__
+
+- Use fewer keystrokes to search words. 
+- Preview searchable words in a popup menu. 
+- Search multiple words even across line boundary.
+- Unobtrusive and does not interfere with Vim's idioms.
+
+__How to use it?__
 
 - Search using `/` or `?`.
 - `<Tab>` and `<Shift-tab>` will select menu items.
 - `<Ctrl-E>` dismisses popup menu.
-- `Enter` to accept selection, and `<Esc>` to dismiss search.
-- `<Ctrl-C>` will force close popup menu.
-- Type `Space` after the first word to include the second word in search.
-- Type `\n` at the end of last word to continue to next line.
+- `<Enter>` accepts selection, and `<Esc>` dismisses search.
+- `<Ctrl-C>` will force popup menu to close.
+- Type the character between words (like `<Space>`) after the first word to include the second word in search.
+- Type `\n` at the end of the last word in a line to continue to next line.
 
 ### Popup Menu
 
@@ -26,15 +33,14 @@ This is the default option.
 
 # Features
 
-- Does not interfere with `c|d|y /pattern` commands.
+- Does not interfere with `c|d|y /pattern` commands (copy/delete/yank).
 - Search command does not get bogged down when searching large files.
 - Respects forward (`/`) and reverse (`?`) search when displaying menu items.
 - Does not interfere with search-history recall (arrow keys, <Ctrl-N/P> are not mapped).
-- Switch between normal popup menu and flat menu (overlay on statusline).
-- Can search across space and newline characters (multi-line search).
 - Does not interfere with search-highlighting and incremental-search.
+- Switch between normal popup menu and flat menu.
 - Fully customizable colors and popup menu options.
-- Only `<tab>` and `<shift-tab>` are mapped in cmdline-mode.
+- Can search across space and newline characters (multi-line search).
 - Written in Vim9script for speed.
 
 # Requirements
