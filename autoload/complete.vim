@@ -354,8 +354,8 @@ def SelectItem(popup: dict<any>, direction: string)
     setcmdline(p.candidates[p.index])
     if &hlsearch
 	matchadd('Search', &ignorecase ? $'\c{p.prefix}' : p.prefix, 11)
-	:redraw
     endif
+    :redraw # Both flatmenu and vertical menu needs redraw after they change selection
 enddef
 
 
