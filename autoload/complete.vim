@@ -6,20 +6,20 @@ export var options: dict<any> = {
     highlight: 'SearchCompleteMenu',
     scrollbarhighlight: 'SearchCompleteSbar',
     thumbhighlight: 'SearchCompleteThumb',
-    horizontalMenu: true,			# 'true' for horizontal menu, 'false' for vertical menu
+    flatMenu: true,				# 'true' for flat menu, 'false' for vertical menu
     searchRange: 1000,				# line count per search attemp
     timeout: 100,				# millisec to search, when non-async is specified
     async: true,				# async search
 }
 
 def PopupOptions(): dict<any>
-    if options.horizontalMenu && !options->has_key('border')
+    if options.flatMenu && !options->has_key('border')
 	options.border = [0, 0, 0, 0]
     endif
     if options.searchRange < 10
 	options.searchRange = 10
     endif
-    return options->copy()->filter((k, _) => k !~ 'enable\|horizontalMenu\|searchRange\|timeout\|async')
+    return options->copy()->filter((k, _) => k !~ 'enable\|flatMenu\|searchRange\|timeout\|async')
 enddef
 
 # Encapsulate the state and operations of search menu completion.
@@ -165,15 +165,15 @@ def MatchingStrings(popup: dict<any>, interval: dict<any>): list<any>
     return matches
 enddef
 
-# Horizontal menu width obtained as needed since user can resize window.
+# Menu width for flat menu is obtained as needed since user can resize window.
 def HMenuWidth(): number
     return winwidth(0) - 4
 enddef
 
-# Display popup menu
+# Display popup menu.
 def ShowPopupMenu(popup: dict<any>)
     var p = popup
-    if options.horizontalMenu
+    if options.flatMenu
 	var hmenu = p.keywords->join(' ')
 	if hmenu->len() > HMenuWidth()
 	    var lastSpaceChar = match(hmenu[0 : HMenuWidth() - 4], '.*\zs\s')
@@ -349,7 +349,7 @@ def SelectItem(popup: dict<any>, direction: string)
 	matchadd('SearchCompleteSelect', kwordpat, 11, -1, {window: p.winid})
     enddef
 
-    options.horizontalMenu ? SelectHoriz() : SelectVert()
+    options.flatMenu ? SelectHoriz() : SelectVert()
     clearmatches()
     setcmdline(p.candidates[p.index])
     if &hlsearch

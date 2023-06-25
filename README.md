@@ -1,7 +1,8 @@
 # search-complete.vim
 
-Async search mode completion with popup menu for Vim. Once you start using it
-you'll not want to go back.
+Async search mode autocompletion for Vim. Target words to search for with fewer
+keystrokes. Preview searchable words in a popup. Search multiple words even
+across line boundary. Unobtrusive and does not interfere with Vim's idioms.
 
 - Search using `/` or `?`.
 - `<Tab>` and `<Shift-tab>` will select menu items.
@@ -11,14 +12,15 @@ you'll not want to go back.
 - Type `Space` after the first word to include the second word in search.
 - Type `\n` at the end of last word to continue to next line.
 
-### Vertical Popup Menu
+### Popup Menu
 
 [![asciicast](https://asciinema.org/a/dGNdbLbsTMSdaL8E4PonxQDKL.svg)](https://asciinema.org/a/dGNdbLbsTMSdaL8E4PonxQDKL)
 
 
-### Horizontal Popup Menu
+### Flat Popup Menu
 
-This is the default choice since it leaves the main window fully visible.
+Main window remains fully visible since popup is positioned on the statusline.
+This is the default option.
 
 [![asciicast](https://asciinema.org/a/DrvlJnoumCA9jWuMH8WGBCVJz.svg)](https://asciinema.org/a/DrvlJnoumCA9jWuMH8WGBCVJz)
 
@@ -28,7 +30,7 @@ This is the default choice since it leaves the main window fully visible.
 - Search command does not get bogged down when searching large files.
 - Respects forward (`/`) and reverse (`?`) search when displaying menu items.
 - Does not interfere with search-history recall (arrow keys, <Ctrl-N/P> are not mapped).
-- Switch between vertical popup menu and horizontal menu (overlay on statusline).
+- Switch between normal popup menu and flat menu (overlay on statusline).
 - Can search across space and newline characters (multi-line search).
 - Does not interfere with search-highlighting and incremental-search.
 - Fully customizable colors and popup menu options.
@@ -72,7 +74,7 @@ If you are using
 augroup MySearchComplete | autocmd!
     autocmd WinEnter,BufEnter * g:SearchCompleteSetup({
                 \   borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-                \   horizontalMenu: false,
+                \   flatMenu: false,
                 \ })
 augroup END
 ```
@@ -80,7 +82,7 @@ augroup END
 Options of interest:
 
 - `maxheight`: Line count of vertical menu, defaults to 12 lines.
-- `horizontalMenu` : 'true' for horizontal menu, 'false' for vertical menu. Defaults to true.
+- `flatMenu` : 'true' for flat menu, 'false' for normal popup menu. Defaults to true.
 - `searchRange`: Lines per search iteration, defaults to 1000 lines.
 - `border`: To disable border set this to `[0, 0, 0, 0]`.
 
@@ -103,10 +105,12 @@ Customize the colors to your liking using highlight groups.
 
 # Performance
 
-Great care is taken to ensure that responsiveness does not deteriorate when searching
-large files. Large files are searched in installments. Each search attempt is
-limited to 1000 lines (configurable). Between each search attempt input
-keystrokes are allowed to be queued into Vim's main loop.
+Great care is taken to ensure that responsiveness does not deteriorate when
+searching large files. Large files are searched in installments. Each search
+attempt is limited to 1000 lines (configurable). Reduce this number if you prefer
+faster response (depends on the hardware). Between each search attempt input
+keystrokes are allowed to be
+queued into Vim's main loop.
 
 # Contributing
 
