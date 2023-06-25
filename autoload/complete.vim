@@ -139,6 +139,8 @@ def MatchingStrings(popup: dict<any>, interval: dict<any>): list<any>
     for item in p.candidates
 	found[item] = 1
     endfor
+    var searchStartTime = p.searchStartTime
+    var timeout = options.timeout
     while [lnum, cnum] != [0, 0]
 	var [endl, endc] = pattern->searchpos('ceW') # end of matching string
 	var lines = getline(lnum, endl)
@@ -155,10 +157,10 @@ def MatchingStrings(popup: dict<any>, interval: dict<any>): list<any>
 	endif
 	cursor(lnum, cnum) # restore cursor to beginning of pattern, otherwise '?' does not work
 	[lnum, cnum] = p.async ? pattern->searchpos(flags, interval.stopl) :
-	    pattern->searchpos(flags, 0, options.timeout)
+	    pattern->searchpos(flags, 0, timeout)
 
 	if !p.async && ([startl, startc] == [lnum, cnum] ||
-		(p.searchStartTime->reltime()->reltimefloat() * 1000) > options.timeout)
+		(searchStartTime->reltime()->reltimefloat() * 1000) > timeout)
 	    break
 	endif
     endwhile
@@ -191,7 +193,7 @@ def ShowPopupMenu(popup: dict<any>)
     matchadd('SearchCompletePrefix', $'\c{p.prefix}', 10, -1, {window: p.winid})
     p.winid->popup_show()
     if !&incsearch # redraw only when noincsearch, otherwise highlight flickers
-       redraw
+       :redraw
     endif
     DisableCmdline()
 enddef
