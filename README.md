@@ -47,12 +47,17 @@ Install using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```
 vim9script
-
 plug#begin()
-
 Plug 'girishji/search-complete.vim'
-
 plug#end()
+```
+
+Legacy script:
+
+```
+call plug#begin()
+Plug 'girishji/search-complete.vim'
+call plug#end()
 ```
 
 Or use Vim's builtin package manager.
@@ -71,6 +76,7 @@ If you are using
 (after calling `Plug`).
 
 ```
+vim9script
 augroup MySearchComplete | autocmd!
     autocmd WinEnter,BufEnter * g:SearchCompleteSetup({
                 \   borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
@@ -79,12 +85,23 @@ augroup MySearchComplete | autocmd!
 augroup END
 ```
 
+Legacy script:
+
+```
+augroup MySearchComplete | autocmd!
+    autocmd WinEnter,BufEnter * call SearchCompleteSetup(#{
+                \   borderchars: ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+                \   flatMenu: v:false,
+                \ })
+augroup END
+```
+
 Options of interest:
 
 - `maxheight`: Line count of vertical menu, defaults to 12 lines.
-- `flatMenu` : 'true' for flat menu, 'false' for normal popup menu. Defaults to true.
-- `searchRange`: Lines per search iteration, defaults to 1000 lines.
 - `border`: To disable border set this to `[0, 0, 0, 0]`.
+- `searchRange`: Lines per search iteration, defaults to 1000 lines.
+- `flatMenu` : 'true' for flat menu, 'false' for normal popup menu. Defaults to true.
 
 ### Commands to Enable and Disable Search Completion
 
