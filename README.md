@@ -131,8 +131,7 @@ Customize the colors to your liking using highlight groups.
 Great care is taken to ensure that responsiveness does not deteriorate when
 searching large files. Large files are searched in installments. Each search
 attempt is limited to 1000 lines (configurable). Reduce this number if you prefer
-faster response (depends on the hardware). Between each search attempt input
-keystrokes are allowed to be
+faster response. Between each search attempt input keystrokes are allowed to be
 queued into Vim's main loop.
 
 # Contributing
