@@ -215,8 +215,8 @@ def SearchWorker(popup: dict<any>, attr: dict<any>, timer: number)
 
     # Add matched fragments to list of candidates and segregate
     var candidates = timediff > 0 ? matches : p.candidates + matches
-    p.candidates = candidates->copy()->filter((_, v) => v =~ $'^{p.prefix}') +
-	candidates->copy()->filter((_, v) => v !~ $'^{p.prefix}')
+    p.candidates = candidates->copy()->filter((_, v) => v =~# $'^{p.prefix}') +
+	candidates->copy()->filter((_, v) => v !~# $'^{p.prefix}')
     p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
 
     if len(p.keywords) > 0
@@ -259,8 +259,8 @@ def UpdateMenu(popup: dict<any>, key: string)
 	var cursorpos = [line('.'), col('.')]
 	var matches = p.matchingStrings({})
 	cursor(cursorpos)
-	p.candidates = matches->copy()->filter((_, v) => v =~ $'^{p.prefix}') +
-	    matches->copy()->filter((_, v) => v !~ $'^{p.prefix}')
+	p.candidates = matches->copy()->filter((_, v) => v =~# $'^{p.prefix}') +
+	    matches->copy()->filter((_, v) => v !~# $'^{p.prefix}')
 	p.keywords = p.candidates->copy()->map((_, val) => val->matchstr('\s*\zs\S\+$'))
 	if len(p.keywords) > 0
 	    p.showPopupMenu()
