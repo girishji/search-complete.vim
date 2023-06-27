@@ -70,6 +70,13 @@ Or use Vim's builtin package manager.
 
 # Configuration
 
+### Case Sensitive Search
+
+`ignorecase` and `smartcase` Vim variables are used to decide menu items. Set
+them appropriately using `set` command.
+
+### Options
+
 There are two types of options that can be configured: 1) options passed directly to Vim's
 [popup_create()](https://vimhelp.org/popup.txt.html#popup_create-arguments)
 function, and 2) options used internally by this plugin. Any option accepted by
