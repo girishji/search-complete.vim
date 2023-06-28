@@ -1,6 +1,7 @@
-# search-complete.vim
+# search-complete
 
-Async search mode auto-completion plugin for Vim. 
+Async search mode auto-completion plugin for Vim. Once you start using it
+you'll not want to go back!
 
 __How it helps?__
 
