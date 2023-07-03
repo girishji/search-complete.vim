@@ -340,7 +340,6 @@ def SelectItem(popup: dict<any>, direction: string)
 	    var hmenu = ''
 	    if direction ==# 'j'
 		hmenu = rotate ? HMenuStr(0, 'left') : HMenuStr(p.index, 'right')
-		echom p.keywords[p.index] .. ' : ' .. hmenu
 	    else 
 		hmenu = rotate ? HMenuStr(p.keywords->len() - 1, 'right') : HMenuStr(p.index, 'left')
 	    endif
