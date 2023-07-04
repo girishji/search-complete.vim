@@ -411,6 +411,7 @@ def CompleteWord(popup: dict<any>)
 		if result == -1 # popup force closed due to <c-c> or cursor mvmt
 		    p.winid->popup_filter_menu('Esc')
 		    feedkeys("\<c-c>", 'n')
+		    EnableCmdline()
 		endif
 	    },
 	}
