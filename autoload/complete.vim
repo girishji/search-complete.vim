@@ -59,6 +59,7 @@ def Init()
     if options.enable
 	popupCompletor = getcmdtype() == '/' ? NewPopup(true) : NewPopup(false)
     endif
+    EnableCmdline()
 enddef
 
 def Teardown()
@@ -83,7 +84,7 @@ export def Setup()
 enddef
 
 def EnableCmdline()
-    autocmd SearchComplete CmdlineChanged /,\? Complete()
+    autocmd! SearchComplete CmdlineChanged /,\? Complete()
 enddef
 
 def DisableCmdline()
