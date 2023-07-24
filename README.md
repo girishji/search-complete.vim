@@ -1,5 +1,7 @@
 ## This plugin is replaced by [AutoSuggest](https://github.com/girishji/autosuggest.vim).
 
+---
+
 # search-complete
 
 Async search mode auto-completion plugin for Vim. Once you start using it
