@@ -1,4 +1,4 @@
-## This plugin is replaced by [AutoSuggest](https://github.com/girishji/autosuggest.vim).
+## This plugin is replaced by [AutoSuggest](https://github.com/girishji/autosuggest.vim). Please use it instead.
 
 ---
 
